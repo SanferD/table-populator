@@ -1,12 +1,19 @@
 package application
 
 import (
+	"time"
 	"sync"
 	"fmt"
 	"github.com/SanferD/table-populator/domain"
 )
 
-const NUM_WORKER_THREADS = 2
+const numWorkerThreads = 1
+const getLocationRateLimit = time.Second / 5 // 5 times per second
+
+type PlaceNameStateCity struct {
+	PlaceName 	string
+	StateCity   domain.StateCity
+}
 
 func Translate(logger domain.Logger, dataIo domain.DataIo,
 			   locationGetter domain.LocationGetter) error {
@@ -18,32 +25,51 @@ func Translate(logger domain.Logger, dataIo domain.DataIo,
 	}
 
 	// buffered queue to hold the records for the threads to work on
-	dataRecordsQueue := make(chan domain.DataRecord, NUM_WORKER_THREADS)
+	dataRecordsChan := make(chan domain.DataRecord, numWorkerThreads)
+	placeNameStateCityChan := make(chan PlaceNameStateCity, numWorkerThreads)
 	var wg sync.WaitGroup
 
 	// spawn multiple threads to process the data records in the queue
-	logger.Info("translating records")
-	for i := 0; i<NUM_WORKER_THREADS; i++ {
+	logger.Info("spawning threads to process data records")
+	for i := 0; i<numWorkerThreads; i++ {
 		wg.Add(1)
-		go processDataRecords(logger, locationGetter, dataIo, &wg, dataRecordsQueue)
+		go fetchLocations(logger, locationGetter, dataIo, &wg, dataRecordsChan, placeNameStateCityChan)
 	}
+
+	// spawn thread to write placeName, state, city to output.csv
+	logger.Info("spawning thread to populate output csv")
+	wg.Add(1)
+	go populateOutput(logger, dataIo, &wg, placeNameStateCityChan)
 
 	// add the records to the queue for the worker threads to process
 	for _, record := range records {
-		dataRecordsQueue <- record
+		dataRecordsChan <- record
 	}
 	
 	// wait for the worker threads to complete
-	close(dataRecordsQueue)
+	close(dataRecordsChan)
+	close(placeNameStateCityChan)
 	wg.Wait()
 	return nil
 }
 
-func processDataRecords(logger domain.Logger, locationGetter domain.LocationGetter, dataIo domain.DataIo,
-						wg *sync.WaitGroup, dataRecordQueue chan domain.DataRecord) {
+func populateOutput(logger domain.Logger, dataIo domain.DataIo, wg *sync.WaitGroup,
+					placeNameStateCityChan chan PlaceNameStateCity) {
 	defer wg.Done()
+	for placeNameStateCity := range placeNameStateCityChan {
+		logger.Debug("writing place with city", placeNameStateCity.PlaceName, placeNameStateCity.StateCity)
+		dataIo.WritePlaceWithCity(placeNameStateCity.PlaceName, placeNameStateCity.StateCity)
+	}
+}
 
-	for dataRecord := range dataRecordQueue {
+func fetchLocations(logger domain.Logger, locationGetter domain.LocationGetter, dataIo domain.DataIo,
+					wg *sync.WaitGroup, dataRecordChan chan domain.DataRecord,
+					dataRecordWithStateCityChan chan PlaceNameStateCity) {
+	defer wg.Done()
+	throttle := time.Tick(getLocationRateLimit)
+
+	for dataRecord := range dataRecordChan {
+		<- throttle
 		// get location
 		logger.Debug("getting location for", dataRecord.PlaceName)
 		stateCity, err := locationGetter.GetLocation(dataRecord.PlaceName)
@@ -52,9 +78,8 @@ func processDataRecords(logger domain.Logger, locationGetter domain.LocationGett
 			logger.Error(err)
 			continue
 		}
-
-		// write location to csv
-		logger.Debug("writing place with city", dataRecord.PlaceName, stateCity.State, stateCity.City)
-		dataIo.WritePlaceWithCity(dataRecord.PlaceName, *stateCity)
+		dataRecordWithStateCityChan <- PlaceNameStateCity{
+			PlaceName: dataRecord.PlaceName,
+			StateCity: *stateCity,}
 	}
 }
