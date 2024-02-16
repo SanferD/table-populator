@@ -2,34 +2,36 @@ package dataio
 
 import (
 	"fmt"
+
+	"github.com/SanferD/table-populator/config"
 	"github.com/SanferD/table-populator/domain"
-	configMod "github.com/SanferD/table-populator/config"
 )
 
-type DataIoKind int
+type DataIOKind int
+
 const (
-	Error 	DataIoKind = -1
-	Csv 	DataIoKind = iota	
+	Error DataIOKind = -1
+	CSV   DataIOKind = iota
 )
 
-func extractDataIoKind(kind string) (DataIoKind, error) {
+func extractDataIOKind(kind string) (DataIOKind, error) {
 	switch kind {
 	case "csv":
-		return Csv, nil
+		return CSV, nil
 	default:
 		return Error, fmt.Errorf("unrecognized dataio kind string: %s", kind)
 	}
 }
 
-func CreateDataIo(config configMod.Config) (domain.DataIo, error) {
-	dataIoKind, err := extractDataIoKind(config.DataIoKind)
+func New(config config.Config) (domain.DataIO, error) {
+	dataIOKind, err := extractDataIOKind(config.DataIOKind)
 	if err != nil {
 		return nil, fmt.Errorf("error extracting dataio kind: %s", err)
 	}
-	switch dataIoKind {
-	case Csv:
-		return InitializeCsvDataIo(config.CsvDataFilePath, config.OutputCsvFilePath)
+	switch dataIOKind {
+	case CSV:
+		return InitializeCsvDataIo(config.CSVDataFilePath, config.OutputCSVFilePath)
 	default:
-		return nil, fmt.Errorf("unrecognized kind '%s'", config.DataIoKind)
+		return nil, fmt.Errorf("unrecognized kind '%s'", config.DataIOKind)
 	}
 }

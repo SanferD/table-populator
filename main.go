@@ -2,34 +2,35 @@ package main
 
 import (
 	"fmt"
-	loggerMod "github.com/SanferD/table-populator/logger"
-	configMod "github.com/SanferD/table-populator/config"
-	dataioMod "github.com/SanferD/table-populator/dataio"
-	locatorMod "github.com/SanferD/table-populator/locator"
+
 	"github.com/SanferD/table-populator/application"
+	"github.com/SanferD/table-populator/config"
+	"github.com/SanferD/table-populator/dataio"
+	"github.com/SanferD/table-populator/locator"
+	"github.com/SanferD/table-populator/logger"
 )
 
 func main() {
 	// initialize config
-	config, err := configMod.InitializeConfig()
+	config, err := config.New()
 	if err != nil {
 		panic(fmt.Errorf("error initializing configuration: %s", err))
 	}
 
 	// initialize logger
-	logger, err := loggerMod.CreateLogger(config)
+	logger, err := logger.New(config)
 	if err != nil {
 		panic(fmt.Errorf("error initializing multi logger: %s", err))
 	}
 
 	// initialize dataio
-	dataio, err := dataioMod.CreateDataIo(config)
+	dataio, err := dataio.New(config)
 	if err != nil {
 		panic(fmt.Errorf("error creating dataio: %s", err))
 	}
 
 	// initialize locator
-	locator, err := locatorMod.CreateLocator(config)
+	locator, err := locator.New(config)
 	if err != nil {
 		panic(fmt.Errorf("error creating locator: %s", err))
 	}

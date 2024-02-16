@@ -67,42 +67,42 @@ my-place-3,city-3,state-3
 ## Example Execution Output
 
 ```
-info:2024/02/14 15:51:57 [reading records]
-info:2024/02/14 15:51:57 [spawning goroutines to process data records]
-info:2024/02/14 15:51:57 [spawning goroutine to populate output csv]
-debug:2024/02/14 15:51:58 [goroutine 0 getting location for place-A]
-debug:2024/02/14 15:51:58 [goroutine 2 getting location for place-B]
-debug:2024/02/14 15:51:58 [goroutine 1 getting location for place-C]
-debug:2024/02/14 15:51:58 [goroutine 2 fetched location for place-B]
-debug:2024/02/14 15:51:58 [goroutine 0 fetched location for place-A]
-debug:2024/02/14 15:51:58 [goroutine 1 fetched location for place-C]
-debug:2024/02/14 15:51:58 [goroutine 2 getting location for place-D]
-debug:2024/02/14 15:51:58 [goroutine 0 getting location for place-E]
-debug:2024/02/14 15:51:58 [goroutine 1 getting location for place-F]
-debug:2024/02/14 15:51:58 [writing place with city place-B]
-debug:2024/02/14 15:51:58 [closing dataRecordsChan]
-debug:2024/02/14 15:51:58 [writing place with city place-A]
-debug:2024/02/14 15:51:58 [writing place with city place-C]
-debug:2024/02/14 15:51:59 [goroutine 0 fetched location for place-E]
-debug:2024/02/14 15:51:59 [goroutine 0 getting location for place-G]
-debug:2024/02/14 15:51:59 [writing place with city place-E]
-debug:2024/02/14 15:51:59 [goroutine 2 fetched location for place-D]
-debug:2024/02/14 15:51:59 [goroutine 2 getting location for place-H]
-debug:2024/02/14 15:51:59 [goroutine 1 fetched location for place-F]
-debug:2024/02/14 15:51:59 [writing place with city place-D]
-debug:2024/02/14 15:51:59 [writing place with city place-F]
-debug:2024/02/14 15:51:59 [goroutine 1 getting location for place-I]
-debug:2024/02/14 15:51:59 [goroutine 0 fetched location for place-G]
-debug:2024/02/14 15:51:59 [goroutine 2 fetched location for place-H]
-debug:2024/02/14 15:51:59 [writing place with city place-G]
-debug:2024/02/14 15:51:59 [goroutine 2 done fetching locations]
-debug:2024/02/14 15:51:59 [goroutine 0 done fetching locations]
-debug:2024/02/14 15:51:59 [writing place with city place-H]
-debug:2024/02/14 15:51:59 [goroutine 1 fetched location for place-I]
-debug:2024/02/14 15:51:59 [goroutine 1 done fetching locations]
-debug:2024/02/14 15:51:59 [writing place with city place-I]
-debug:2024/02/14 15:51:59 [closing placeNameStateCityChan]
-debug:2024/02/14 15:51:59 [waiting for all output records to be written]
+info:2024/02/14 15:51:57 reading records
+info:2024/02/14 15:51:57 spawning goroutines to process data records
+info:2024/02/14 15:51:57 spawning goroutine to populate output csv
+debug:2024/02/14 15:51:58 goroutine 0 getting location for place-A
+debug:2024/02/14 15:51:58 goroutine 2 getting location for place-B
+debug:2024/02/14 15:51:58 goroutine 1 getting location for place-C
+debug:2024/02/14 15:51:58 goroutine 2 fetched location for place-B
+debug:2024/02/14 15:51:58 goroutine 0 fetched location for place-A
+debug:2024/02/14 15:51:58 goroutine 1 fetched location for place-C
+debug:2024/02/14 15:51:58 goroutine 2 getting location for place-D
+debug:2024/02/14 15:51:58 goroutine 0 getting location for place-E
+debug:2024/02/14 15:51:58 goroutine 1 getting location for place-F
+debug:2024/02/14 15:51:58 writing place with city place-B
+debug:2024/02/14 15:51:58 closing dataRecordsChan
+debug:2024/02/14 15:51:58 writing place with city place-A
+debug:2024/02/14 15:51:58 writing place with city place-C
+debug:2024/02/14 15:51:59 goroutine 0 fetched location for place-E
+debug:2024/02/14 15:51:59 goroutine 0 getting location for place-G
+debug:2024/02/14 15:51:59 writing place with city place-E
+debug:2024/02/14 15:51:59 goroutine 2 fetched location for place-D
+debug:2024/02/14 15:51:59 goroutine 2 getting location for place-H
+debug:2024/02/14 15:51:59 goroutine 1 fetched location for place-F
+debug:2024/02/14 15:51:59 writing place with city place-D
+debug:2024/02/14 15:51:59 writing place with city place-F
+debug:2024/02/14 15:51:59 goroutine 1 getting location for place-I
+debug:2024/02/14 15:51:59 goroutine 0 fetched location for place-G
+debug:2024/02/14 15:51:59 goroutine 2 fetched location for place-H
+debug:2024/02/14 15:51:59 writing place with city place-G
+debug:2024/02/14 15:51:59 goroutine 2 done fetching locations
+debug:2024/02/14 15:51:59 goroutine 0 done fetching locations
+debug:2024/02/14 15:51:59 writing place with city place-H
+debug:2024/02/14 15:51:59 goroutine 1 fetched location for place-I
+debug:2024/02/14 15:51:59 goroutine 1 done fetching locations
+debug:2024/02/14 15:51:59 writing place with city place-I
+debug:2024/02/14 15:51:59 closing placeNameStateCityChan
+debug:2024/02/14 15:51:59 waiting for all output records to be written
 ```
 
 # Todos

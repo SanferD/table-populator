@@ -1,20 +1,21 @@
 package locator
 
 import (
-	"strings"
 	"context"
 	"fmt"
-	configMod "github.com/SanferD/table-populator/config"
-	"googlemaps.github.io/maps"
+	"strings"
+
+	"github.com/SanferD/table-populator/config"
 	"github.com/SanferD/table-populator/domain"
+	"googlemaps.github.io/maps"
 )
 
 type GoogleMapsLocator struct {
 	mapsClient *maps.Client
 }
 
-func InitializeMapLocator(config configMod.Config) (*GoogleMapsLocator, error) {
-	mapsClient, err := maps.NewClient(maps.WithAPIKey(config.MapsApiKey))
+func InitializeMapLocator(config config.Config) (*GoogleMapsLocator, error) {
+	mapsClient, err := maps.NewClient(maps.WithAPIKey(config.MapsAPIKey))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create new maps client: %s", err)
 	}
@@ -32,14 +33,14 @@ func (mapsLocator *GoogleMapsLocator) GetLocation(placeName string) (*domain.Sta
 	if err != nil {
 		return nil, fmt.Errorf("failed to get text response for '%s': %s", placeName, err)
 	}
-	
+
 	// extract city and state code from formatted address
 	if len(res.Results) == 0 {
 		return nil, fmt.Errorf("failed to get any results for '%s'", placeName)
 	}
 	formattedAddress := res.Results[0].FormattedAddress
 	addressParts := strings.Split(formattedAddress, ",")
-	if len(addressParts) < 3  {
+	if len(addressParts) < 3 {
 		err = fmt.Errorf("formatted address '%s' doesn't have 3 commas", formattedAddress)
 		return nil, err
 	}

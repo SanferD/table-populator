@@ -1,6 +1,6 @@
 package domain
 
-type DataIo interface {
+type DataIO interface {
 	ReadRecords() ([]DataRecord, error)
 	WritePlaceWithCity(placeName string, stateCity StateCity) error
 }

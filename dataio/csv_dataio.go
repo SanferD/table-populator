@@ -1,19 +1,19 @@
 package dataio
 
 import (
-	"os"
-	"fmt"
 	"encoding/csv"
+	"fmt"
+	"os"
 
 	"github.com/SanferD/table-populator/domain"
 )
 
-type CsvDataIo struct {
-	CsvReader *csv.Reader
-	CsvWriter *csv.Writer
+type CSVDataIO struct {
+	CSVReader *csv.Reader
+	CSVWriter *csv.Writer
 }
 
-func InitializeCsvDataIo(inputPath string, outputPath string) (*CsvDataIo, error) {
+func InitializeCsvDataIo(inputPath string, outputPath string) (*CSVDataIO, error) {
 	// initialize csv reader
 	fdIn, err := os.Open(inputPath)
 	if err != nil {
@@ -26,15 +26,15 @@ func InitializeCsvDataIo(inputPath string, outputPath string) (*CsvDataIo, error
 		return nil, fmt.Errorf("error opening output csv file: %s", err)
 	}
 
-	csvDataIo := CsvDataIo{
-		CsvReader: csv.NewReader(fdIn),
-		CsvWriter: csv.NewWriter(fdOut),
+	csvDataIO := CSVDataIO{
+		CSVReader: csv.NewReader(fdIn),
+		CSVWriter: csv.NewWriter(fdOut),
 	}
-	return &csvDataIo, nil
+	return &csvDataIO, nil
 }
 
-func (csvDataIo *CsvDataIo) ReadRecords() ([]domain.DataRecord, error) {
-	csvReader := csvDataIo.CsvReader
+func (csvDataIO *CSVDataIO) ReadRecords() ([]domain.DataRecord, error) {
+	csvReader := csvDataIO.CSVReader
 	var dataRecords = make([]domain.DataRecord, 0)
 	records, err := csvReader.ReadAll()
 	if err != nil {
@@ -47,9 +47,9 @@ func (csvDataIo *CsvDataIo) ReadRecords() ([]domain.DataRecord, error) {
 	return dataRecords, nil
 }
 
-func (csvDataIo *CsvDataIo) WritePlaceWithCity(placeName string, stateCity domain.StateCity) error {
-	csvWriter := csvDataIo.CsvWriter
-	row := []string{placeName, stateCity.City, stateCity.State,}
+func (csvDataIO *CSVDataIO) WritePlaceWithCity(placeName string, stateCity domain.StateCity) error {
+	csvWriter := csvDataIO.CSVWriter
+	row := []string{placeName, stateCity.City, stateCity.State}
 	if err := csvWriter.Write(row); err != nil {
 		return fmt.Errorf("error witing record to file: %s", err)
 	}

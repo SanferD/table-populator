@@ -2,21 +2,22 @@ package config
 
 import (
 	"fmt"
+
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	CsvDataFilePath   string  `mapstructure:"CSV_DATA_FILE_PATH"`	
-	MapsApiKey 		  string  `mapstructure:"MAPS_API_KEY"`
-	OutputCsvFilePath string  `mapstructure:"OUTPUT_FILE_PATH"`
-	DataIoKind		  string  `mapstructure:"DATAIO_KIND"`
-	LocatorKind 	  string  `mapstructure:"LOCATOR_KIND"`
-	LoggerKind 		  string  `mapstructure:"LOGGER_KIND"`
-	LogToStdout 	  bool 	  `mapstructure:"LOG_TO_STDOUT"`
-	LogFilePath 	  *string `mapstructure:"LOG_FILE_PATH"`
+	CSVDataFilePath   string  `mapstructure:"CSV_DATA_FILE_PATH"`
+	MapsAPIKey        string  `mapstructure:"MAPS_API_KEY"`
+	OutputCSVFilePath string  `mapstructure:"OUTPUT_FILE_PATH"`
+	DataIOKind        string  `mapstructure:"DATAIO_KIND"`
+	LocatorKind       string  `mapstructure:"LOCATOR_KIND"`
+	LoggerKind        string  `mapstructure:"LOGGER_KIND"`
+	LogToStdout       bool    `mapstructure:"LOG_TO_STDOUT"`
+	LogFilePath       *string `mapstructure:"LOG_FILE_PATH"`
 }
 
-func InitializeConfig() (Config, error) {
+func New() (Config, error) {
 	var config Config
 
 	// configure

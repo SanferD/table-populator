@@ -2,14 +2,16 @@ package locator
 
 import (
 	"fmt"
+
+	"github.com/SanferD/table-populator/config"
 	"github.com/SanferD/table-populator/domain"
-	configMod "github.com/SanferD/table-populator/config"
 )
 
 type LocatorKind int
+
 const (
-	Error 		LocatorKind = -1
-	GoogleMaps 	LocatorKind = iota
+	Error      LocatorKind = -1
+	GoogleMaps LocatorKind = iota
 )
 
 func extractLocatorKind(kind string) (LocatorKind, error) {
@@ -21,13 +23,12 @@ func extractLocatorKind(kind string) (LocatorKind, error) {
 	}
 }
 
-
-func CreateLocator(config configMod.Config) (domain.LocationGetter, error) {
+func New(config config.Config) (domain.LocationGetter, error) {
 	locatorKind, err := extractLocatorKind(config.LocatorKind)
 	if err != nil {
 		return nil, fmt.Errorf("error extracting locator kind: %s", err)
 	}
-	switch (locatorKind) {
+	switch locatorKind {
 	case GoogleMaps:
 		return InitializeMapLocator(config)
 	default:

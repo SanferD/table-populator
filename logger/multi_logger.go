@@ -1,21 +1,22 @@
 package logger
 
 import (
-	"os"
-	"log"
 	"fmt"
-	configMod "github.com/SanferD/table-populator/config"
+	"log"
+	"os"
+
+	"github.com/SanferD/table-populator/config"
 )
 
 type MultiLogger struct {
 	Loggers []*log.Logger
-	File *os.File
+	File    *os.File
 }
 
-func InitializeMultiLogger(config configMod.Config) (*MultiLogger, error) {
+func InitializeMultiLogger(config config.Config) (*MultiLogger, error) {
 	loggers := make([]*log.Logger, 0)
 
-	// initialize stdout logger	
+	// initialize stdout logger
 	if config.LogToStdout {
 		stdoutLogger := log.New(os.Stdout, "", log.LstdFlags)
 		loggers = append(loggers, stdoutLogger)
@@ -61,7 +62,7 @@ func (multiLogger *MultiLogger) Fatal(msgs ...any) {
 func (multiLogger *MultiLogger) doLog(prefix string, msgs ...any) {
 	for _, logger := range multiLogger.Loggers {
 		logger.SetPrefix(prefix + ":")
-		logger.Println(msgs)
+		logger.Println(msgs...)
 	}
 	if prefix == "fatal" {
 		os.Exit(1)
