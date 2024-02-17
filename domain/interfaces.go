@@ -5,7 +5,7 @@ type DataIO interface {
 	WritePlaceWithCity(placeName string, stateCity StateCity) error
 }
 
-type LocationGetter interface {
+type Locator interface {
 	GetLocation(name string) (*StateCity, error)
 }
 

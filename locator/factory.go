@@ -23,7 +23,7 @@ func extractLocatorKind(kind string) (LocatorKind, error) {
 	}
 }
 
-func New(config config.Config) (domain.LocationGetter, error) {
+func New(config config.Config) (domain.Locator, error) {
 	locatorKind, err := extractLocatorKind(config.LocatorKind)
 	if err != nil {
 		return nil, fmt.Errorf("error extracting locator kind: %s", err)

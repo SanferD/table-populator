@@ -16,7 +16,22 @@ type PlaceNameStateCity struct {
 	StateCity domain.StateCity
 }
 
-func Translate(logger domain.Logger, dataIO domain.DataIO, locationGetter domain.LocationGetter) error {
+func newDataRecordChan() chan domain.DataRecord {
+	// buffered channel to hold the records for the location getter goroutines to translate placeName to location
+	return make(chan domain.DataRecord, numWorkerGoroutines)
+}
+
+func newPlaceNameStateCityChan() chan PlaceNameStateCity {
+	// buffered channel to hold the records for the placeName goroutines to write (placeName, stateCity) to output csv
+	return make(chan PlaceNameStateCity, numWorkerGoroutines)
+}
+
+func newDonePopulateOutputChannel() chan bool {
+	// channel to notify when all the output records have been written to the output
+	return make(chan bool)
+}
+
+func Translate(logger domain.Logger, dataIO domain.DataIO, locator domain.Locator) error {
 	// read records from file
 	logger.Info("reading records")
 	records, err := dataIO.ReadRecords()
@@ -24,19 +39,16 @@ func Translate(logger domain.Logger, dataIO domain.DataIO, locationGetter domain
 		return fmt.Errorf("error translating records: %s", err)
 	}
 
-	// buffered channel to hold the records for the location getter goroutines to translate placeName to location
-	drCh := make(chan domain.DataRecord, numWorkerGoroutines)
-	// buffered channel to hold the records for the placeName goroutines to write (placeName, stateCity) to output csv
-	pnscCh := make(chan PlaceNameStateCity, numWorkerGoroutines)
-	// channel to notify when all the output records have been written to the output
-	dpoCh := make(chan bool)
+	drCh := newDataRecordChan()
+	pnscCh := newPlaceNameStateCityChan()
+	dpoCh := newDonePopulateOutputChannel()
 	var wg sync.WaitGroup // used to block the top-level function until all the location getter goroutines have terminated
 
 	// spawn multiple goroutines to process the data records in the queue
 	logger.Info("spawning goroutines to process data records")
 	for i := 0; i < numWorkerGoroutines; i++ {
 		wg.Add(1)
-		go fetchLocations(i, logger, locationGetter, dataIO, &wg, drCh, pnscCh)
+		go fetchLocations(i, logger, locator, dataIO, &wg, drCh, pnscCh)
 	}
 
 	// spawn goroutine to write placeName, state, city to output.csv
@@ -66,17 +78,18 @@ func populateOutput(logger domain.Logger, dataIO domain.DataIO, pnscCh chan Plac
 	dpoCh <- true
 }
 
-func fetchLocations(id int, logger domain.Logger, locationGetter domain.LocationGetter, dataIO domain.DataIO, wg *sync.WaitGroup, drCh chan domain.DataRecord, pnscCh chan PlaceNameStateCity) {
+func fetchLocations(id int, logger domain.Logger, locator domain.Locator, dataIO domain.DataIO, wg *sync.WaitGroup, drCh chan domain.DataRecord, pnscCh chan PlaceNameStateCity) {
 	defer wg.Done()
-	throttle := time.Tick(getLocationRateLimit)
+	rateLimiter := time.NewTicker(getLocationRateLimit)
 
 	for dataRecord := range drCh {
-		<-throttle
+		<-rateLimiter.C
+
 		// get location
 		logger.Debug("goroutine", id, "getting location for", dataRecord.PlaceName)
-		stateCity, err := locationGetter.GetLocation(dataRecord.PlaceName)
+		stateCity, err := locator.GetLocation(dataRecord.PlaceName)
 		if err != nil {
-			err = fmt.Errorf("could not fetch location for '%s': %s", dataRecord.PlaceName, err)
+			err = fmt.Errorf("goroutine %d could not fetch location for '%s': %s", id, dataRecord.PlaceName, err)
 			logger.Error(err)
 			continue
 		}
