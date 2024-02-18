@@ -3,8 +3,8 @@
 # Introduction
 
 An enterprise-y placeName to planeName,city,state translator,
-which effectively reads placeName data from a csv file, extracts the city and state using google maps api,
-and creates an output csv file with the placeName, city, state associated together.
+which effectively reads placeName data from a csv file, extracts city and state using google maps api,
+and creates an output csv file with placeName, city, state associated together.
 
 - Uses Ports and Adaptors architecture
   - **domain**: Contains domain structures and interfaces (ports). Has no dependencies.
@@ -24,6 +24,18 @@ make build
 make run
 make test
 make coverage
+```
+
+- Note that in order to run the coverage report, it's necessary to install `gocovmerge`:
+
+```
+go install github.com/wadey/gocovmerge@latest
+```
+
+Might need the following if gocovmerge is not found in syspath
+
+```
+export PATH=$PATH:$(go env GOPATH)/bin
 ```
 
 ![Example coverage output](static-readme/coverage.png)
@@ -113,6 +125,6 @@ debug:2024/02/14 15:51:59 waiting for all output records to be written
 
 # Todos
 
-- [ ] Add unit tests
+- [x] Add unit tests
 - [ ] Integration tests
 - [ ] Acceptance tests
