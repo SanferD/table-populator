@@ -16,15 +16,17 @@ and creates an output csv file with the placeName, city, state associated togeth
 
 # How to Run
 
-- Configure environment
-- Build and Run
+- Configure environment. Then
 
 ```
-go build -o build/table-populator
-./build/table-populator
+make clean
+make build
+make run
+make test
+make coverage
 ```
 
--
+![Example coverage output](static-readme/coverage.png)
 
 ## Example `.env` File
 
@@ -47,6 +49,10 @@ LOGGER_KIND="multi"
 LOG_TO_STDOUT=1
 LOG_FILE_PATH=
 ```
+
+## Where to find Maps key
+
+Navigate to google cloud console > APIs & Services > [Credentials](https://console.cloud.google.com/apis/credentials) and create a key restricted to just the **Places API**.
 
 ## Example Input Format
 
