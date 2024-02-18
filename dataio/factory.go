@@ -19,19 +19,18 @@ func extractDataIOKind(kind string) (DataIOKind, error) {
 	case "csv":
 		return CSV, nil
 	default:
-		return Error, fmt.Errorf("unrecognized dataio kind string: %s", kind)
+		return Error, fmt.Errorf("unrecognized dataio kind string '%s'", kind)
 	}
 }
 
 func New(config config.Config) (domain.DataIO, error) {
 	dataIOKind, err := extractDataIOKind(config.DataIOKind)
-	if err != nil {
-		return nil, fmt.Errorf("error extracting dataio kind: %s", err)
-	}
 	switch dataIOKind {
 	case CSV:
 		return InitializeCsvDataIo(config.CSVDataFilePath, config.OutputCSVFilePath)
+	case Error:
+		fallthrough
 	default:
-		return nil, fmt.Errorf("unrecognized kind '%s'", config.DataIOKind)
+		return nil, fmt.Errorf("error extracting dataio kind: %s", err)
 	}
 }

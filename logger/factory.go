@@ -19,19 +19,18 @@ func extractLoggerKind(kind string) (LoggerKind, error) {
 	case "multi":
 		return Multi, nil
 	default:
-		return Error, fmt.Errorf("unrecognized logger kind string: %s", kind)
+		return Error, fmt.Errorf("unrecognized logger kind string '%s'", kind)
 	}
 }
 
 func New(config config.Config) (domain.Logger, error) {
 	loggerKind, err := extractLoggerKind(config.LoggerKind)
-	if err != nil {
-		return nil, fmt.Errorf("error extracting logger kind: %s", config.LoggerKind)
-	}
 	switch loggerKind {
 	case Multi:
 		return InitializeMultiLogger(config)
+	case Error:
+		fallthrough
 	default:
-		return nil, fmt.Errorf("unrecognized log kind '%s'", config.LoggerKind)
+		return nil, fmt.Errorf("error extracting logger kind: %s", err)
 	}
 }
