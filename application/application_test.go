@@ -148,9 +148,9 @@ func newMockLogger() *logger.MockLogger {
 func newMockDataIO(isReadRecordsError bool) *dataio.MockDataIO {
 	mockDataIO := new(dataio.MockDataIO)
 	if isReadRecordsError {
-		mockDataIO.On("ReadRecords", nil).Return(drValues, errReadRecords)
+		mockDataIO.On("ReadRecords").Return(drValues, errReadRecords)
 	} else {
-		mockDataIO.On("ReadRecords", nil).Return(drValues, nil)
+		mockDataIO.On("ReadRecords").Return(drValues, nil)
 	}
 	mockDataIO.On("WritePlaceWithCity", mock.Anything, mock.Anything).Return(nil)
 	return mockDataIO
