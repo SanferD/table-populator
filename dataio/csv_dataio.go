@@ -3,27 +3,27 @@ package dataio
 import (
 	"encoding/csv"
 	"fmt"
-	"os"
 
 	"github.com/SanferD/table-populator/domain"
+	"github.com/SanferD/table-populator/ioutil"
 )
 
 type CSVDataIO struct {
-	CSVReader *csv.Reader
-	CSVWriter *csv.Writer
+	CSVReader ioutil.CSVReader
+	CSVWriter ioutil.CSVWriter
 }
 
-func InitializeCsvDataIo(inputPath string, outputPath string) (*CSVDataIO, error) {
+func InitializeCSVDataIo(fo ioutil.FileOpener, inputPath, outputPath string) (*CSVDataIO, error) {
 	// initialize csv reader
-	fdIn, err := os.Open(inputPath)
+	fdIn, err := fo.Open(inputPath)
 	if err != nil {
 		return nil, fmt.Errorf("error opening input csv file: %s", err)
 	}
 
 	// initialize csv writer
-	fdOut, err := os.Create(outputPath)
+	fdOut, err := fo.Create(outputPath)
 	if err != nil {
-		return nil, fmt.Errorf("error opening output csv file: %s", err)
+		return nil, fmt.Errorf("error creating output csv file: %s", err)
 	}
 
 	csvDataIO := CSVDataIO{
@@ -51,7 +51,7 @@ func (csvDataIO *CSVDataIO) WritePlaceWithCity(placeName string, stateCity domai
 	csvWriter := csvDataIO.CSVWriter
 	row := []string{placeName, stateCity.City, stateCity.State}
 	if err := csvWriter.Write(row); err != nil {
-		return fmt.Errorf("error witing record to file: %s", err)
+		return fmt.Errorf("error writing record to file: %s", err)
 	}
 	csvWriter.Flush()
 	return nil

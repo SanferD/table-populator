@@ -5,6 +5,7 @@ import (
 
 	"github.com/SanferD/table-populator/config"
 	"github.com/SanferD/table-populator/domain"
+	"github.com/SanferD/table-populator/ioutil"
 )
 
 type DataIOKind int
@@ -27,7 +28,8 @@ func New(config config.Config) (domain.DataIO, error) {
 	dataIOKind, err := extractDataIOKind(config.DataIOKind)
 	switch dataIOKind {
 	case CSV:
-		return InitializeCsvDataIo(config.CSVDataFilePath, config.OutputCSVFilePath)
+		osFO := ioutil.OSFileOpener{}
+		return InitializeCSVDataIo(osFO, config.CSVDataFilePath, config.OutputCSVFilePath)
 	case Error:
 		fallthrough
 	default:
