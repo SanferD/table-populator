@@ -10,8 +10,12 @@ import (
 	"googlemaps.github.io/maps"
 )
 
+type MapsClient interface {
+	TextSearch(context.Context, *maps.TextSearchRequest) (maps.PlacesSearchResponse, error)
+}
+
 type GoogleMapsLocator struct {
-	mapsClient *maps.Client
+	mapsClient MapsClient
 }
 
 func InitializeMapLocator(config config.Config) (*GoogleMapsLocator, error) {
