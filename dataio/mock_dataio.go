@@ -10,7 +10,7 @@ type MockDataIO struct {
 }
 
 func (md *MockDataIO) ReadRecords() ([]domain.DataRecord, error) {
-	args := md.Called(nil)
+	args := md.Called()
 	return args.Get(0).([]domain.DataRecord), args.Error(1)
 }
 

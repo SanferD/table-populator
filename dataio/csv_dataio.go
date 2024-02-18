@@ -13,7 +13,7 @@ type CSVDataIO struct {
 	CSVWriter ioutil.CSVWriter
 }
 
-func InitializeCSVDataIo(fo ioutil.Ops, inputPath, outputPath string) (*CSVDataIO, error) {
+func InitializeCSVDataIo(fo ioutil.FileOps, inputPath, outputPath string) (*CSVDataIO, error) {
 	// initialize csv reader
 	fdIn, err := fo.Open(inputPath)
 	if err != nil {

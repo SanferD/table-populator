@@ -44,7 +44,7 @@ func (mw *MockCSVWriter) Write(row []string) error {
 }
 
 func (mw *MockCSVWriter) Flush() {
-	_ = mw.Called(nil)
+	_ = mw.Called()
 }
 
 type MockLogCreator struct {

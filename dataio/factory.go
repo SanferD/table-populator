@@ -28,7 +28,7 @@ func New(config config.Config) (domain.DataIO, error) {
 	dataIOKind, err := extractDataIOKind(config.DataIOKind)
 	switch dataIOKind {
 	case CSV:
-		osFO := ioutil.StdFileOps{}
+		osFO := new(ioutil.StdFileOps)
 		return InitializeCSVDataIo(osFO, config.CSVDataFilePath, config.OutputCSVFilePath)
 	case Error:
 		fallthrough

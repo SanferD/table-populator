@@ -87,28 +87,31 @@ func TestNew(t *testing.T) {
 type testInitializeCSVDataIO struct {
 	createFile  *os.File
 	openFile    *os.File
-	createErr   error
-	openErr     error
-	expectedErr error
+	errCreate   error
+	errOpen     error
+	errExpected error
 }
 
 func TestInitializeCSVDataIO(t *testing.T) {
 	testCases := []testInitializeCSVDataIO{
 		// OK
-		{createFile: emptyFile, openFile: emptyFile, createErr: nil, openErr: nil, expectedErr: nil},
+		{createFile: emptyFile, openFile: emptyFile, errCreate: nil, errOpen: nil, errExpected: nil},
 		// Open error
-		{createFile: nil, openFile: nil, createErr: nil, openErr: errors.New("open error"), expectedErr: errors.New("error opening input csv file: open error")},
+		{createFile: nil, openFile: nil, errCreate: nil, errOpen: errors.New("open error"), errExpected: errors.New("error opening input csv file: open error")},
 		// Create error
-		{createFile: emptyFile, openFile: nil, createErr: errors.New("create error"), openErr: nil, expectedErr: errors.New("error creating output csv file: create error")},
+		{createFile: emptyFile, openFile: nil, errCreate: errors.New("create error"), errOpen: nil, errExpected: errors.New("error creating output csv file: create error")},
 	}
 	for _, tc := range testCases {
-		mockIOUtil := new(ioutil.MockFileOps)
-		mockIOUtil.On("Open", csvInputPath).Return(tc.openFile, tc.openErr)
-		mockIOUtil.On("Create", csvOutputPath).Return(tc.createFile, tc.createErr)
+		mockFileOps := new(ioutil.MockFileOps)
+		mockFileOps.On("Open", csvInputPath).Return(tc.openFile, tc.errOpen)
+		if tc.errOpen == nil {
+			mockFileOps.On("Create", csvOutputPath).Return(tc.createFile, tc.errCreate)
+		}
 
-		_, err := InitializeCSVDataIo(mockIOUtil, csvInputPath, csvOutputPath)
+		_, err := InitializeCSVDataIo(mockFileOps, csvInputPath, csvOutputPath)
 
-		assert.Equal(t, tc.expectedErr, err)
+		assert.Equal(t, tc.errExpected, err)
+		mockFileOps.AssertExpectations(t)
 	}
 }
 
@@ -119,7 +122,7 @@ type testReadRecords struct {
 	errExpected error
 }
 
-func TestReadRecrods(t *testing.T) {
+func TestReadRecords(t *testing.T) {
 	testCases := []testReadRecords{
 		// OK
 		{errReadAll: nil, retReadAll: parsedCSVRows, retExpected: dataRecords, errExpected: nil},
@@ -137,6 +140,7 @@ func TestReadRecrods(t *testing.T) {
 
 		assert.Equal(t, tc.retExpected, dataRecords)
 		assert.Equal(t, tc.errExpected, err)
+		mockCSVReader.AssertExpectations(t)
 	}
 }
 
@@ -161,13 +165,14 @@ func TestWriteRecords(t *testing.T) {
 		mockCSVWriter := new(ioutil.MockCSVWriter)
 		row := []string{tc.placeName, tc.stateCity.City, tc.stateCity.State}
 		mockCSVWriter.On("Write", row).Return(tc.errWrite)
-		mockCSVWriter.On("Flush", nil).Return(nil)
+		if tc.errWrite == nil {
+			mockCSVWriter.On("Flush").Return(nil)
+		}
 
 		csvDataIO := CSVDataIO{CSVReader: mockCSVReader, CSVWriter: mockCSVWriter}
 		err := csvDataIO.WritePlaceWithCity(tc.placeName, tc.stateCity)
 
 		assert.Equal(t, tc.errExpected, err)
-		mockCSVWriter.AssertNumberOfCalls(t, "Flush", tc.flushExpectedCallsCount)
-		mockCSVWriter.AssertNumberOfCalls(t, "Write", 1)
+		mockCSVWriter.AssertExpectations(t)
 	}
 }
