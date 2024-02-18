@@ -2,41 +2,47 @@ package logger
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 
 	"github.com/SanferD/table-populator/config"
+	"github.com/SanferD/table-populator/ioutil"
 )
 
 type MultiLogger struct {
-	Loggers []*log.Logger
-	File    *os.File
+	loggers []ioutil.Logger
+	file    io.Closer
+	fileOps ioutil.FileOps
 }
 
-func InitializeMultiLogger(config config.Config) (*MultiLogger, error) {
-	loggers := make([]*log.Logger, 0)
+func InitializeMultiLogger(config config.Config, fo ioutil.FileOps, lc ioutil.LogCreator) (*MultiLogger, error) {
+	loggers := make([]ioutil.Logger, 0)
 
 	// initialize stdout logger
 	if config.LogToStdout {
-		stdoutLogger := log.New(os.Stdout, "", log.LstdFlags)
+		stdoutLogger := lc.New(os.Stdout, "", log.LstdFlags)
 		loggers = append(loggers, stdoutLogger)
 	}
 
-	//initialize file logger
+	// initialize file logger
 	var file os.File
 	if config.LogFilePath != nil {
-		file, err := os.Create(*config.LogFilePath)
+		file, err := fo.Create(*config.LogFilePath)
 		if err != nil {
 			return nil, fmt.Errorf("error creating file for file logger: %s", err)
 		}
-		fileLogger := log.New(file, "", log.LstdFlags)
+		fileLogger := lc.New(file, "", log.LstdFlags)
 		loggers = append(loggers, fileLogger)
 	}
-	return &MultiLogger{Loggers: loggers, File: &file}, nil
+	return &MultiLogger{loggers: loggers, file: &file, fileOps: fo}, nil
 }
 
-func (multiLogger *MultiLogger) Close() {
-	multiLogger.File.Close()
+func (multiLogger *MultiLogger) Close() error {
+	if err := multiLogger.file.Close(); err != nil {
+		return fmt.Errorf("error closing file: %s", err)
+	}
+	return nil
 }
 
 func (multiLogger *MultiLogger) Info(msgs ...any) {
@@ -60,11 +66,11 @@ func (multiLogger *MultiLogger) Fatal(msgs ...any) {
 }
 
 func (multiLogger *MultiLogger) doLog(prefix string, msgs ...any) {
-	for _, logger := range multiLogger.Loggers {
+	for _, logger := range multiLogger.loggers {
 		logger.SetPrefix(prefix + ":")
 		logger.Println(msgs...)
 	}
 	if prefix == "fatal" {
-		os.Exit(1)
+		multiLogger.fileOps.Exit(1)
 	}
 }

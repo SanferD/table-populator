@@ -5,6 +5,7 @@ import (
 
 	"github.com/SanferD/table-populator/config"
 	"github.com/SanferD/table-populator/domain"
+	"github.com/SanferD/table-populator/ioutil"
 )
 
 type LoggerKind int
@@ -27,7 +28,9 @@ func New(config config.Config) (domain.Logger, error) {
 	loggerKind, err := extractLoggerKind(config.LoggerKind)
 	switch loggerKind {
 	case Multi:
-		return InitializeMultiLogger(config)
+		fo := new(ioutil.StdFileOps)
+		lc := new(ioutil.StdLogCreator)
+		return InitializeMultiLogger(config, fo, lc)
 	case Error:
 		fallthrough
 	default:

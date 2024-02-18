@@ -1,36 +1,41 @@
 package ioutil
 
 import (
+	"io"
 	"os"
 
 	"github.com/stretchr/testify/mock"
 )
 
-type MockIOUtil struct {
+type MockFileOps struct {
 	mock.Mock
 }
 
-func (miou *MockIOUtil) Open(name string) (*os.File, error) {
+func (miou *MockFileOps) Open(name string) (*os.File, error) {
 	args := miou.Called(name)
 	return args.Get(0).(*os.File), args.Error(1)
 }
 
-func (miou *MockIOUtil) Create(name string) (*os.File, error) {
+func (miou *MockFileOps) Create(name string) (*os.File, error) {
 	args := miou.Called(name)
 	return args.Get(0).(*os.File), args.Error(1)
+}
+
+func (miou *MockFileOps) Exit(id int) {
+	_ = miou.Called(id)
 }
 
 type MockCSVReader struct {
 	mock.Mock
 }
 
-type MockCSVWriter struct {
-	mock.Mock
-}
-
 func (mr *MockCSVReader) ReadAll() ([][]string, error) {
 	args := mr.Called(nil)
 	return args.Get(0).([][]string), args.Error(1)
+}
+
+type MockCSVWriter struct {
+	mock.Mock
 }
 
 func (mw *MockCSVWriter) Write(row []string) error {
@@ -40,4 +45,34 @@ func (mw *MockCSVWriter) Write(row []string) error {
 
 func (mw *MockCSVWriter) Flush() {
 	_ = mw.Called(nil)
+}
+
+type MockLogCreator struct {
+	mock.Mock
+}
+
+func (mlc *MockLogCreator) New(w io.Writer, prefix string, flags int) Logger {
+	args := mlc.Called(w, prefix, flags)
+	return args.Get(0).(Logger)
+}
+
+type MockLogger struct {
+	mock.Mock
+}
+
+func (ml *MockLogger) SetPrefix(prefix string) {
+	_ = ml.Called(prefix)
+}
+
+func (ml *MockLogger) Println(msgs ...any) {
+	_ = ml.Called(msgs...)
+}
+
+type MockCloser struct {
+	mock.Mock
+}
+
+func (mc *MockCloser) Close() error {
+	args := mc.Called()
+	return args.Error(0)
 }

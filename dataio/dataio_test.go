@@ -102,7 +102,7 @@ func TestInitializeCSVDataIO(t *testing.T) {
 		{createFile: emptyFile, openFile: nil, createErr: errors.New("create error"), openErr: nil, expectedErr: errors.New("error creating output csv file: create error")},
 	}
 	for _, tc := range testCases {
-		mockIOUtil := new(ioutil.MockIOUtil)
+		mockIOUtil := new(ioutil.MockFileOps)
 		mockIOUtil.On("Open", csvInputPath).Return(tc.openFile, tc.openErr)
 		mockIOUtil.On("Create", csvOutputPath).Return(tc.createFile, tc.createErr)
 

@@ -1,22 +1,29 @@
 package ioutil
 
 import (
+	"io"
+	"log"
 	"os"
 )
 
-type FileOpener interface {
+type FileOps interface {
 	Open(name string) (*os.File, error)
 	Create(name string) (*os.File, error)
+	Exit(code int)
 }
 
-type OSFileOpener struct{}
+type StdFileOps struct{}
 
-func (o OSFileOpener) Open(name string) (*os.File, error) {
+func (o *StdFileOps) Open(name string) (*os.File, error) {
 	return os.Open(name)
 }
 
-func (o OSFileOpener) Create(name string) (*os.File, error) {
+func (o *StdFileOps) Create(name string) (*os.File, error) {
 	return os.Create(name)
+}
+
+func (o *StdFileOps) Exit(code int) {
+	os.Exit(code)
 }
 
 type CSVReader interface {
@@ -26,4 +33,19 @@ type CSVReader interface {
 type CSVWriter interface {
 	Write([]string) error
 	Flush()
+}
+
+type Logger interface {
+	SetPrefix(string)
+	Println(...any)
+}
+
+type LogCreator interface {
+	New(io.Writer, string, int) Logger
+}
+
+type StdLogCreator struct{}
+
+func (StdLogCreator) New(out io.Writer, prefix string, flag int) Logger {
+	return log.New(out, prefix, flag)
 }
