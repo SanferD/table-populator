@@ -26,13 +26,13 @@ make test
 make coverage
 ```
 
-- Note that in order to run the coverage report, it's necessary to install `gocovmerge`:
+Running `make coverage` presumes `gocovmerge` is installed:
 
 ```
 go install github.com/wadey/gocovmerge@latest
 ```
 
-Might need the following if gocovmerge is not found in syspath
+Might need the following if `gocovmerge` is not found in syspath
 
 ```
 export PATH=$PATH:$(go env GOPATH)/bin
@@ -64,7 +64,7 @@ LOG_FILE_PATH=
 
 ## Where to find Maps key
 
-Navigate to google cloud console > APIs & Services > [Credentials](https://console.cloud.google.com/apis/credentials) and create a key restricted to just the **Places API**.
+Navigate to google cloud console > APIs & Services > [Credentials](https://console.cloud.google.com/apis/credentials) and create a key restricted to **Places API**.
 
 ## Example Input Format
 
