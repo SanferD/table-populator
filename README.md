@@ -9,8 +9,10 @@ and creates an output csv file with placeName, city, state associated together.
 - Uses Ports and Adaptors architecture
   - **domain**: Contains domain structures and interfaces (ports). Has no dependencies.
   - **application**: Performs the application logic over the domain. Only depends on the domain.
+  - **ioutil**: Abstracts out interactions with the stdlib by introducing interfaces and stdlib and mock implementations in order to facilitate unit testing.
+    Depends on stdlib and testify only.
   - **logger**, **locator**, **dataio**: These implement the interfaces to interact with the outside world,
-    i.e. are adapters to the ports found in the domain. Depends on **domain**, **config**.
+    i.e. are adapters to the ports found in the domain. Depends on **domain**, **config**, **ioutil**
   - **config**: Reads the configuration information found in `.env` configuration file.
   - **main**: Ties everything together.
 
